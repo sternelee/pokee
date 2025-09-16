@@ -58,7 +58,6 @@ Download from [jan.ai](https://jan.ai/) or [GitHub Releases](https://github.com/
 
 ## Features
 
-- **Local AI Models**: Download and run LLMs (Llama, Gemma, Qwen, etc.) from HuggingFace
 - **Cloud Integration**: Connect to OpenAI, Anthropic, Mistral, Groq, and others
 - **Custom Assistants**: Create specialized AI assistants for your tasks
 - **OpenAI-Compatible API**: Local server at `localhost:1337` for other applications
@@ -170,6 +169,5 @@ Apache 2.0 - Because sharing is caring.
 
 Built on the shoulders of giants:
 
-- [Llama.cpp](https://github.com/ggerganov/llama.cpp)
 - [Tauri](https://tauri.app/)
 - [Scalar](https://github.com/scalar/scalar)
