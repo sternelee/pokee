@@ -49,12 +49,6 @@ const mainMenus = [
     isEnabled: PlatformFeatures[PlatformFeature.ASSISTANTS],
   },
   {
-    title: 'common:hub',
-    icon: IconAppsFilled,
-    route: route.hub.index,
-    isEnabled: PlatformFeatures[PlatformFeature.MODEL_HUB],
-  },
-  {
     title: 'common:settings',
     icon: IconSettingsFilled,
     route: route.settings.general,
@@ -253,7 +247,8 @@ const LeftPanel = () => {
           <div
             className={cn(
               'flex flex-col',
-              Object.keys(downloads).length > 0 || localDownloadingModels.size > 0
+              Object.keys(downloads).length > 0 ||
+                localDownloadingModels.size > 0
                 ? 'h-[calc(100%-200px)]'
                 : 'h-[calc(100%-140px)]'
             )}
@@ -366,7 +361,9 @@ const LeftPanel = () => {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="bottom" align="end">
-                          <DeleteAllThreadsDialog onDeleteAll={deleteAllThreads} />
+                          <DeleteAllThreadsDialog
+                            onDeleteAll={deleteAllThreads}
+                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -413,7 +410,7 @@ const LeftPanel = () => {
           <div className="space-y-1 shrink-0 py-1 mt-2">
             {mainMenus.map((menu) => {
               if (!menu.isEnabled) {
-                  return null
+                return null
               }
               const isActive =
                 currentPath.includes(route.settings.index) &&

@@ -20,8 +20,8 @@ import type {
   ModelPlan,
 } from './types'
 
-// TODO: Replace this with the actual provider later
-const defaultProvider = 'llamacpp'
+// Default provider should be empty - no local models
+const defaultProvider = ''
 
 export class DefaultModelsService implements ModelsService {
   private getEngine(provider: string = defaultProvider) {

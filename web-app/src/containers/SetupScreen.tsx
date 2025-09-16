@@ -3,7 +3,6 @@ import { useModelProvider } from '@/hooks/useModelProvider'
 import { Link } from '@tanstack/react-router'
 import { route } from '@/constants/routes'
 import HeaderPage from './HeaderPage'
-import { isProd } from '@/lib/version'
 import { useTranslation } from '@/i18n/react-i18next-compat'
 import { localStorageKey } from '@/constants/localStorage'
 
@@ -31,22 +30,6 @@ function SetupScreen() {
             </p>
           </div>
           <div className="flex gap-4 flex-col">
-            <Card
-              header={
-                <Link
-                  to={route.hub.index}
-                  search={{
-                    ...(!isProd ? { step: 'setup_local_provider' } : {}),
-                  }}
-                >
-                  <div>
-                    <h1 className="text-main-view-fg font-medium text-base">
-                      {t('setup:localModel')}
-                    </h1>
-                  </div>
-                </Link>
-              }
-            ></Card>
             <Card
               header={
                 <Link

@@ -44,7 +44,7 @@ vi.mock('@/hooks/useModelProvider', () => ({
     providers: [],
     getModelBy: vi.fn(),
     selectModelProvider: vi.fn(),
-    selectedProvider: 'llamacpp',
+    selectedProvider: 'openai',
     setProviders: vi.fn(),
     getProviderByName: vi.fn(),
     updateProvider: vi.fn(),
@@ -149,7 +149,7 @@ describe('ChatInput', () => {
       },
       providers: [
         {
-          provider: 'llamacpp',
+          provider: 'openai',
           models: [
             {
               id: 'test-model',
@@ -163,7 +163,7 @@ describe('ChatInput', () => {
         capabilities: ['tools', 'vision'],
       })),
       selectModelProvider: vi.fn(),
-      selectedProvider: 'llamacpp',
+      selectedProvider: 'openai',
       setProviders: vi.fn(),
       getProviderByName: vi.fn(),
       updateProvider: vi.fn(),
@@ -322,7 +322,7 @@ describe('ChatInput', () => {
       providers: [],
       getModelBy: vi.fn(),
       selectModelProvider: vi.fn(),
-      selectedProvider: 'llamacpp',
+      selectedProvider: 'openai',
       setProviders: vi.fn(),
       getProviderByName: vi.fn(),
       updateProvider: vi.fn(),
@@ -398,7 +398,7 @@ describe('ChatInput', () => {
       providers: [],
       getModelBy: vi.fn(),
       selectModelProvider: vi.fn(),
-      selectedProvider: 'llamacpp',
+      selectedProvider: 'openai',
       setProviders: vi.fn(),
       getProviderByName: vi.fn(),
       updateProvider: vi.fn(),

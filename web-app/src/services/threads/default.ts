@@ -51,7 +51,7 @@ export class DefaultThreadsService implements ThreadsService {
               ...(thread.assistants?.[0] ?? defaultAssistant),
               model: {
                 id: thread.model?.id ?? '*',
-                engine: thread.model?.provider ?? 'llamacpp',
+                engine: thread.model?.provider ?? '',
               },
             },
           ],

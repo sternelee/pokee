@@ -107,11 +107,11 @@ describe('WebProvidersService', () => {
   })
 
   describe('getProviders', () => {
-    it('should return builtin and runtime providers', async () => {
+    it('should return builtin providers only (local providers excluded)', async () => {
       const providers = await providersService.getProviders()
 
-      expect(providers).toHaveLength(2) // 1 runtime + 1 builtin (mocked)
-      expect(providers.some((p) => p.provider === 'llamacpp')).toBe(true)
+      expect(providers).toHaveLength(1) // 1 builtin (mocked), runtime providers excluded
+      expect(providers.some((p) => p.provider === 'llamacpp')).toBe(false)
       expect(providers.some((p) => p.provider === 'openai')).toBe(true)
     })
 
@@ -125,14 +125,11 @@ describe('WebProvidersService', () => {
       expect(openaiProvider?.models[0].capabilities).toContain('tools')
     })
 
-    it('should create runtime providers from engine manager', async () => {
+    it('should not create runtime providers (local providers excluded)', async () => {
       const providers = await providersService.getProviders()
       const llamacppProvider = providers.find((p) => p.provider === 'llamacpp')
 
-      expect(llamacppProvider).toBeDefined()
-      expect(llamacppProvider?.base_url).toBe('http://localhost:1337')
-      expect(llamacppProvider?.models).toHaveLength(1)
-      expect(llamacppProvider?.settings).toHaveLength(1)
+      expect(llamacppProvider).toBeUndefined()
     })
   })
 

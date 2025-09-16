@@ -16,6 +16,11 @@ export class WebProvidersService implements ProvidersService {
   async getProviders(): Promise<ModelProvider[]> {
     const runtimeProviders: ModelProvider[] = []
     for (const [providerName, value] of EngineManager.instance().engines) {
+      // Skip local inference providers
+      if (providerName === 'llamacpp') {
+        continue
+      }
+
       const models = (await value.list()) ?? []
       const provider: ModelProvider = {
         active: false,

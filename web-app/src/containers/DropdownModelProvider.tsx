@@ -106,14 +106,19 @@ const DropdownModelProvider = ({
     const initializeModel = async () => {
       // Auto select model when existing thread is passed
       if (model) {
-        selectModelProvider(model?.provider as string, model?.id as string)
-        if (!checkModelExists(model.provider, model.id)) {
+        // Skip local models (llamacpp)
+        if (model.provider === 'llamacpp') {
           selectModelProvider('', '')
+        } else {
+          selectModelProvider(model?.provider as string, model?.id as string)
+          if (!checkModelExists(model.provider, model.id)) {
+            selectModelProvider('', '')
+          }
         }
       } else if (useLastUsedModel) {
         // Try to use last used model only when explicitly requested (for new chat)
         const lastUsed = getLastUsedModel()
-        if (lastUsed && checkModelExists(lastUsed.provider, lastUsed.model)) {
+        if (lastUsed && lastUsed.provider !== 'llamacpp' && checkModelExists(lastUsed.provider, lastUsed.model)) {
           selectModelProvider(lastUsed.provider, lastUsed.model)
         } else {
           // For web-only builds, auto-select the first model from jan provider
@@ -198,6 +203,8 @@ const DropdownModelProvider = ({
 
     providers.forEach((provider) => {
       if (!provider.active) return
+      // Skip local inference provider (llamacpp)
+      if (provider.provider === 'llamacpp') return
 
       provider.models.forEach((modelItem) => {
         // Skip models that require API key but don't have one
@@ -271,7 +278,7 @@ const DropdownModelProvider = ({
     if (!searchValue) {
       // When not searching, show all active providers (even without models)
       providers.forEach((provider) => {
-        if (provider.active) {
+        if (provider.active && provider.provider !== 'llamacpp') {
           groups[provider.provider] = []
         }
       })

@@ -7,7 +7,7 @@ import SetupScreen from '../SetupScreen'
 vi.mock('@/hooks/useModelProvider', () => ({
   useModelProvider: vi.fn(() => ({
     providers: [],
-    selectedProvider: 'llamacpp',
+    selectedProvider: '',
     setProviders: vi.fn(),
     addProvider: vi.fn(),
   })),

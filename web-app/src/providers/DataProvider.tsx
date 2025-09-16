@@ -6,8 +6,6 @@ import { useServiceHub } from '@/hooks/useServiceHub'
 import { useEffect } from 'react'
 import { useMCPServers } from '@/hooks/useMCPServers'
 import { useAssistant } from '@/hooks/useAssistant'
-import { useNavigate } from '@tanstack/react-router'
-import { route } from '@/constants/routes'
 import { useThreads } from '@/hooks/useThreads'
 import { useLocalApiServer } from '@/hooks/useLocalApiServer'
 import { useAppState } from '@/hooks/useAppState'
@@ -23,7 +21,6 @@ export function DataProvider() {
   const { setServers } = useMCPServers()
   const { setAssistants, initializeWithLastUsed } = useAssistant()
   const { setThreads } = useThreads()
-  const navigate = useNavigate()
   const serviceHub = useServiceHub()
 
   // Local API Server hooks
@@ -43,8 +40,13 @@ export function DataProvider() {
   useEffect(() => {
     console.log('Initializing DataProvider...')
     serviceHub.providers().getProviders().then(setProviders)
-    serviceHub.mcp().getMCPConfig().then((data) => setServers(data.mcpServers ?? {}))
-    serviceHub.assistants().getAssistants()
+    serviceHub
+      .mcp()
+      .getMCPConfig()
+      .then((data) => setServers(data.mcpServers ?? {}))
+    serviceHub
+      .assistants()
+      .getAssistants()
       .then((data) => {
         // Only update assistants if we have valid data
         if (data && Array.isArray(data) && data.length > 0) {
@@ -55,20 +57,22 @@ export function DataProvider() {
       .catch((error) => {
         console.warn('Failed to load assistants, keeping default:', error)
       })
-    serviceHub.deeplink().getCurrent().then(handleDeepLink)
-    serviceHub.deeplink().onOpenUrl(handleDeepLink)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceHub])
 
   useEffect(() => {
-    serviceHub.threads().fetchThreads().then((threads) => {
-      setThreads(threads)
-      threads.forEach((thread) =>
-        serviceHub.messages().fetchMessages(thread.id).then((messages) =>
-          setMessages(thread.id, messages)
+    serviceHub
+      .threads()
+      .fetchThreads()
+      .then((threads) => {
+        setThreads(threads)
+        threads.forEach((thread) =>
+          serviceHub
+            .messages()
+            .fetchMessages(thread.id)
+            .then((messages) => setMessages(thread.id, messages))
         )
-      )
-    })
+      })
   }, [serviceHub, setThreads, setMessages])
 
   // Check for app updates
@@ -119,19 +123,7 @@ export function DataProvider() {
       }
     }
 
-    // Use first model from llamacpp provider
-    const llamacppProvider = getProviderByName('llamacpp')
-    if (
-      llamacppProvider &&
-      llamacppProvider.models &&
-      llamacppProvider.models.length > 0
-    ) {
-      return {
-        model: llamacppProvider.models[0].id,
-        provider: llamacppProvider,
-      }
-    }
-
+    // No suitable model found for local API server
     return null
   }
 
@@ -157,7 +149,9 @@ export function DataProvider() {
       setServerStatus('pending')
 
       // Start the model first
-      serviceHub.models().startModel(modelToStart.provider, modelToStart.model)
+      serviceHub
+        .models()
+        .startModel(modelToStart.provider, modelToStart.model)
         .then(() => {
           console.log(`Model ${modelToStart.model} started successfully`)
 
@@ -183,28 +177,6 @@ export function DataProvider() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceHub])
-
-  const handleDeepLink = (urls: string[] | null) => {
-    if (!urls) return
-    console.log('Received deeplink:', urls)
-    const deeplink = urls[0]
-    if (deeplink) {
-      const url = new URL(deeplink)
-      const params = url.pathname.split('/').filter((str) => str.length > 0)
-
-      if (params.length < 3) return undefined
-      // const action = params[0]
-      // const provider = params[1]
-      const resource = params.slice(1).join('/')
-      // return { action, provider, resource }
-      navigate({
-        to: route.hub.model,
-        search: {
-          repo: resource,
-        },
-      })
-    }
-  }
 
   return null
 }

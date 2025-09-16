@@ -14,8 +14,8 @@ export const PlatformFeatures: Record<PlatformFeature, boolean> = {
   // Hardware monitoring and GPU usage
   [PlatformFeature.HARDWARE_MONITORING]: isPlatformTauri(),
 
-  // Local model inference (llama.cpp)
-  [PlatformFeature.LOCAL_INFERENCE]: isPlatformTauri(),
+  // Local model inference (llama.cpp) - DISABLED
+  [PlatformFeature.LOCAL_INFERENCE]: false,
 
   // Local API server
   [PlatformFeature.LOCAL_API_SERVER]: isPlatformTauri(),
