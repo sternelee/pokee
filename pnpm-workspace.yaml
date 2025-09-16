@@ -1,0 +1,4 @@
+packages:
+  - 'core'
+  - 'extensions-web'
+  - 'web-app'
