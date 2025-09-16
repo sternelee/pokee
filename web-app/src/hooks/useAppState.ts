@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { ThreadMessage } from '@janhq/core'
 import { MCPTool } from '@/types/completion'
 import { useAssistant } from './useAssistant'
-import { ChatCompletionMessageToolCall } from 'openai/resources'
+import { ChatCompletionMessageToolCall } from '@/types/completion'
 
 type AppErrorMessage = {
   message?: string

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { CompletionMessagesBuilder } from '../messages'
 import { ThreadMessage } from '@janhq/core'
-import { ChatCompletionMessageToolCall } from 'openai/resources'
+import { ChatCompletionMessageToolCall } from '../../types/completion'
 
 // Mock thread messages for testing
 const createMockThreadMessage = (
@@ -427,7 +427,9 @@ describe('CompletionMessagesBuilder', () => {
       )
 
       const result = builder.getMessages()
-      expect(result[0].content).toBe('<|channel|>analysis<|message|>Only analysis content here...')
+      expect(result[0].content).toBe(
+        '<|channel|>analysis<|message|>Only analysis content here...'
+      )
     })
 
     it('should handle analysis channel with multiline content', () => {
@@ -438,7 +440,9 @@ describe('CompletionMessagesBuilder', () => {
       )
 
       const result = builder.getMessages()
-      expect(result[0].content).toBe('Based on my analysis, here is the result.')
+      expect(result[0].content).toBe(
+        'Based on my analysis, here is the result.'
+      )
     })
 
     it('should handle both think and analysis channel tags', () => {

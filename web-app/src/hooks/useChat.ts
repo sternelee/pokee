@@ -18,7 +18,7 @@ import {
 } from '@/lib/completion'
 import { CompletionMessagesBuilder } from '@/lib/messages'
 import { renderInstructions } from '@/lib/instructionTemplate'
-import { ChatCompletionMessageToolCall } from 'openai/resources'
+import { ChatCompletionMessageToolCall } from '@/types/completion'
 import { useAssistant } from './useAssistant'
 
 import { useServiceHub } from '@/hooks/useServiceHub'
@@ -108,7 +108,10 @@ export const useChat = () => {
       await serviceHub.models().stopAllModels()
       await new Promise((resolve) => setTimeout(resolve, 1000))
       updateLoadingModel(true)
-      await serviceHub.models().startModel(provider, modelId).catch(console.error)
+      await serviceHub
+        .models()
+        .startModel(provider, modelId)
+        .catch(console.error)
       updateLoadingModel(false)
       await new Promise((resolve) => setTimeout(resolve, 1000))
     },
@@ -188,7 +191,9 @@ export const useChat = () => {
         settings: newSettings,
       }
 
-      await serviceHub.providers().updateSettings(providerName, updateObj.settings ?? [])
+      await serviceHub
+        .providers()
+        .updateSettings(providerName, updateObj.settings ?? [])
       updateProvider(providerName, {
         ...provider,
         ...updateObj,
@@ -237,7 +242,9 @@ export const useChat = () => {
 
         const builder = new CompletionMessagesBuilder(
           messages,
-          currentAssistant ? renderInstructions(currentAssistant.instructions) : undefined
+          currentAssistant
+            ? renderInstructions(currentAssistant.instructions)
+            : undefined
         )
         if (troubleshooting) builder.addUserMessage(message, attachments)
 
