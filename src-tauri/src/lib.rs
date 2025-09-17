@@ -107,7 +107,6 @@ pub fn run() {
             mcp_restart_counts: Arc::new(Mutex::new(HashMap::new())),
             mcp_active_servers: Arc::new(Mutex::new(HashMap::new())),
             mcp_successfully_connected: Arc::new(Mutex::new(HashMap::new())),
-            server_handle: Arc::new(Mutex::new(None)),
             tool_call_cancellations: Arc::new(Mutex::new(HashMap::new())),
         })
         .setup(|app| {

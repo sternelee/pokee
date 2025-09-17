@@ -1,54 +1,34 @@
-use std::collections::HashMap;
-use std::sync::Arc;
 use tauri::{AppHandle, Runtime, State};
-use tokio::sync::Mutex;
 
-use crate::core::server::proxy::{self, BackendSession};
 use crate::core::state::AppState;
 
 #[tauri::command]
 pub async fn start_server<R: Runtime>(
     _app_handle: AppHandle<R>,
-    state: State<'_, AppState>,
-    host: String,
-    port: u16,
-    prefix: String,
-    api_key: String,
-    trusted_hosts: Vec<String>,
-    proxy_timeout: u64,
+    _state: State<'_, AppState>,
+    _host: String,
+    _port: u16,
+    _prefix: String,
+    _api_key: String,
+    _trusted_hosts: Vec<String>,
+    _proxy_timeout: u64,
 ) -> Result<bool, String> {
-    let server_handle = state.server_handle.clone();
-    // Create empty sessions map since we don't have llamacpp plugin anymore
-    let sessions: Arc<Mutex<HashMap<i32, BackendSession>>> = Arc::new(Mutex::new(HashMap::new()));
-
-    proxy::start_server(
-        server_handle,
-        sessions,
-        host,
-        port,
-        prefix,
-        api_key,
-        vec![trusted_hosts],
-        proxy_timeout,
-    )
-    .await
-    .map_err(|e| e.to_string())?;
-    Ok(true)
+    // Server functionality has been removed due to hyper dependency removal
+    // This is a placeholder that returns false to indicate server is not started
+    log::warn!("Server functionality has been disabled");
+    Ok(false)
 }
 
 #[tauri::command]
-pub async fn stop_server(state: State<'_, AppState>) -> Result<(), String> {
-    let server_handle = state.server_handle.clone();
-
-    proxy::stop_server(server_handle)
-        .await
-        .map_err(|e| e.to_string())?;
+pub async fn stop_server(_state: State<'_, AppState>) -> Result<(), String> {
+    // Server functionality has been removed
+    log::warn!("Server functionality has been disabled");
     Ok(())
 }
 
 #[tauri::command]
-pub async fn get_server_status(state: State<'_, AppState>) -> Result<bool, String> {
-    let server_handle = state.server_handle.clone();
-
-    Ok(proxy::is_server_running(server_handle).await)
+pub async fn get_server_status(_state: State<'_, AppState>) -> Result<bool, String> {
+    // Server functionality has been removed
+    log::warn!("Server functionality has been disabled");
+    Ok(false)
 }

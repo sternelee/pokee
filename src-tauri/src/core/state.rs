@@ -6,11 +6,7 @@ use rmcp::{
     service::RunningService,
     RoleClient, ServiceError,
 };
-use tokio::sync::{Mutex, oneshot};
-use tokio::task::JoinHandle;
-
-/// Server handle type for managing the proxy server lifecycle
-pub type ServerHandle = JoinHandle<Result<(), Box<dyn std::error::Error + Send + Sync>>>;
+use tokio::sync::{oneshot, Mutex};
 
 pub enum RunningServiceEnum {
     NoInit(RunningService<RoleClient, ()>),
@@ -26,7 +22,6 @@ pub struct AppState {
     pub mcp_restart_counts: Arc<Mutex<HashMap<String, u32>>>,
     pub mcp_active_servers: Arc<Mutex<HashMap<String, serde_json::Value>>>,
     pub mcp_successfully_connected: Arc<Mutex<HashMap<String, bool>>>,
-    pub server_handle: Arc<Mutex<Option<ServerHandle>>>,
     pub tool_call_cancellations: Arc<Mutex<HashMap<String, oneshot::Sender<()>>>>,
 }
 

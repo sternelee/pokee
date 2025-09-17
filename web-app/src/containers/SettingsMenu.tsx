@@ -99,12 +99,12 @@ const SettingsMenu = () => {
       hasSubMenu: false,
       isEnabled: PlatformFeatures[PlatformFeature.LOCAL_API_SERVER],
     },
-    {
-      title: 'common:https_proxy',
-      route: route.settings.https_proxy,
-      hasSubMenu: false,
-      isEnabled: PlatformFeatures[PlatformFeature.HTTPS_PROXY],
-    },
+    // {
+    //   title: 'common:https_proxy',
+    //   route: route.settings.https_proxy,
+    //   hasSubMenu: false,
+    //   isEnabled: PlatformFeatures[PlatformFeature.HTTPS_PROXY],
+    // },
   ]
 
   const toggleProvidersExpansion = () => {

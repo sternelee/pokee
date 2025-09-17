@@ -12,7 +12,7 @@ export const route = {
     shortcuts: '/settings/shortcuts',
     local_api_server: '/settings/local-api-server',
     mcp_servers: '/settings/mcp-servers',
-    https_proxy: '/settings/https-proxy',
+    // https_proxy: '/settings/https-proxy',
     hardware: '/settings/hardware',
   },
   localApiServerlogs: '/local-api-server/logs',
