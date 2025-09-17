@@ -3,7 +3,8 @@
     "allow": [
       "Bash(rm:*)",
       "Bash(npm run type-check:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(cargo check:*)"
     ],
     "deny": [],
     "ask": []

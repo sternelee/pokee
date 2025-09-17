@@ -15,19 +15,19 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
 default = [
-    "tauri/wry",
-    "tauri/common-controls-v6",
-    "tauri/x11",
-    "tauri/protocol-asset",
-    "tauri/macos-private-api",
-    "tauri/test",
+  "tauri/wry",
+  "tauri/common-controls-v6",
+  "tauri/x11",
+  "tauri/protocol-asset",
+  "tauri/macos-private-api",
+  "tauri/test",
 ]
 test-tauri = [
-    "tauri/wry",
-    "tauri/x11",
-    "tauri/protocol-asset",
-    "tauri/macos-private-api",
-    "tauri/test",
+  "tauri/wry",
+  "tauri/x11",
+  "tauri/protocol-asset",
+  "tauri/macos-private-api",
+  "tauri/test",
 ]
 
 [build-dependencies]
@@ -45,12 +45,12 @@ libloading = "0.8.7"
 log = "0.4"
 reqwest = { version = "0.11", features = ["json", "blocking", "stream"] }
 rmcp = { version = "0.6.0", features = [
-    "client",
-    "transport-sse-client",
-    "transport-streamable-http-client",
-    "transport-child-process",
-    "tower",
-    "reqwest",
+  "client",
+  "transport-sse-client",
+  "transport-streamable-http-client",
+  "transport-child-process",
+  "tower",
+  "reqwest",
 ] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -70,6 +70,7 @@ tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7.14"
 url = "2.5"
 uuid = { version = "1.7", features = ["v4"] }
+rig-core = { git = "https://github.com/sternelee/rig", branch = "dev" }
 
 [dependencies.tauri]
 version = "2.5.0"

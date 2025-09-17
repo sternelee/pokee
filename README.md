@@ -171,3 +171,38 @@ Built on the shoulders of giants:
 
 - [Tauri](https://tauri.app/)
 - [Scalar](https://github.com/scalar/scalar)
+
+rig chat example:
+
+```
+// Start streaming chat
+  const streamId = await window.__TAURI__.invoke('stream_chat', {
+    prompt: "What's the weather like today?",
+    provider: "openai",
+    model: "gpt-4o",
+    chat_history: [
+      { role: "user", content: "Hello, how are you?" },
+      { role: "assistant", content: "I'm doing well, thank you!" }
+    ]
+  });
+
+  // Listen for streaming events
+  window.__TAURI__.event.listen('chat-stream', (event) => {
+    const { stream_id, content, event_type, is_final } = event.payload;
+
+    if (event_type === 'text') {
+      // Append text to UI
+    } else if (event_type === 'complete') {
+      // Mark as complete
+    } else if (event_type === 'error') {
+      // Handle errors
+    }
+  });
+
+  // Or use non-streaming
+  const response = await window.__TAURI__.invoke('chat', {
+    prompt: 'Tell me about AI',
+    provider: 'anthropic',
+    model: 'claude-3-sonnet'
+  });
+```

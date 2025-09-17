@@ -33,7 +33,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_hardware::init())
         .invoke_handler(tauri::generate_handler![
-            // FS commands - Deperecate soon
+            // FS commands - Deprecate soon
             core::filesystem::commands::join_path,
             core::filesystem::commands::mkdir,
             core::filesystem::commands::exists_sync,
@@ -95,6 +95,10 @@ pub fn run() {
             // Download
             core::downloads::commands::download_files,
             core::downloads::commands::cancel_download_task,
+            // Chat
+            core::chat::commands::stream_chat,
+            core::chat::commands::chat,
+            core::chat::commands::cancel_chat_stream,
         ])
         .manage(AppState {
             app_token: Some(generate_app_token()),
