@@ -8,7 +8,6 @@ import {
   IconSettingsFilled,
   IconStar,
   IconMessageFilled,
-  IconAppsFilled,
   IconX,
   IconSearch,
   IconClipboardSmileFilled,

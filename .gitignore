@@ -60,3 +60,6 @@ src-tauri/resources/
 ## test
 test-data
 llm-docs
+
+## src-tauri
+src-tauri/gen

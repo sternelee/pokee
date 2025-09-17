@@ -70,12 +70,6 @@ const SettingsMenu = () => {
       isEnabled: true,
     },
     {
-      title: 'common:privacy',
-      route: route.settings.privacy,
-      hasSubMenu: false,
-      isEnabled: PlatformFeatures[PlatformFeature.ANALYTICS],
-    },
-    {
       title: 'common:modelProviders',
       route: route.settings.model_providers,
       hasSubMenu: activeProviders.length > 0,

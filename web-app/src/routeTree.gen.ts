@@ -15,7 +15,6 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThreadsThreadIdRouteImport } from './routes/threads/$threadId'
 import { Route as SettingsShortcutsRouteImport } from './routes/settings/shortcuts'
-import { Route as SettingsPrivacyRouteImport } from './routes/settings/privacy'
 import { Route as SettingsMcpServersRouteImport } from './routes/settings/mcp-servers'
 import { Route as SettingsLocalApiServerRouteImport } from './routes/settings/local-api-server'
 import { Route as SettingsHttpsProxyRouteImport } from './routes/settings/https-proxy'
@@ -54,11 +53,6 @@ const ThreadsThreadIdRoute = ThreadsThreadIdRouteImport.update({
 const SettingsShortcutsRoute = SettingsShortcutsRouteImport.update({
   id: '/settings/shortcuts',
   path: '/settings/shortcuts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsPrivacyRoute = SettingsPrivacyRouteImport.update({
-  id: '/settings/privacy',
-  path: '/settings/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsMcpServersRoute = SettingsMcpServersRouteImport.update({
@@ -120,7 +114,6 @@ export interface FileRoutesByFullPath {
   '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
-  '/settings/privacy': typeof SettingsPrivacyRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
   '/threads/$threadId': typeof ThreadsThreadIdRoute
   '/settings/providers/$providerName': typeof SettingsProvidersProviderNameRoute
@@ -138,7 +131,6 @@ export interface FileRoutesByTo {
   '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
-  '/settings/privacy': typeof SettingsPrivacyRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
   '/threads/$threadId': typeof ThreadsThreadIdRoute
   '/settings/providers/$providerName': typeof SettingsProvidersProviderNameRoute
@@ -157,7 +149,6 @@ export interface FileRoutesById {
   '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
-  '/settings/privacy': typeof SettingsPrivacyRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
   '/threads/$threadId': typeof ThreadsThreadIdRoute
   '/settings/providers/$providerName': typeof SettingsProvidersProviderNameRoute
@@ -177,7 +168,6 @@ export interface FileRouteTypes {
     | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
-    | '/settings/privacy'
     | '/settings/shortcuts'
     | '/threads/$threadId'
     | '/settings/providers/$providerName'
@@ -195,7 +185,6 @@ export interface FileRouteTypes {
     | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
-    | '/settings/privacy'
     | '/settings/shortcuts'
     | '/threads/$threadId'
     | '/settings/providers/$providerName'
@@ -213,7 +202,6 @@ export interface FileRouteTypes {
     | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
-    | '/settings/privacy'
     | '/settings/shortcuts'
     | '/threads/$threadId'
     | '/settings/providers/$providerName'
@@ -232,7 +220,6 @@ export interface RootRouteChildren {
   SettingsHttpsProxyRoute: typeof SettingsHttpsProxyRoute
   SettingsLocalApiServerRoute: typeof SettingsLocalApiServerRoute
   SettingsMcpServersRoute: typeof SettingsMcpServersRoute
-  SettingsPrivacyRoute: typeof SettingsPrivacyRoute
   SettingsShortcutsRoute: typeof SettingsShortcutsRoute
   ThreadsThreadIdRoute: typeof ThreadsThreadIdRoute
   SettingsProvidersProviderNameRoute: typeof SettingsProvidersProviderNameRoute
@@ -281,13 +268,6 @@ declare module '@tanstack/react-router' {
       path: '/settings/shortcuts'
       fullPath: '/settings/shortcuts'
       preLoaderRoute: typeof SettingsShortcutsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/privacy': {
-      id: '/settings/privacy'
-      path: '/settings/privacy'
-      fullPath: '/settings/privacy'
-      preLoaderRoute: typeof SettingsPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/mcp-servers': {
@@ -368,7 +348,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsHttpsProxyRoute: SettingsHttpsProxyRoute,
   SettingsLocalApiServerRoute: SettingsLocalApiServerRoute,
   SettingsMcpServersRoute: SettingsMcpServersRoute,
-  SettingsPrivacyRoute: SettingsPrivacyRoute,
   SettingsShortcutsRoute: SettingsShortcutsRoute,
   ThreadsThreadIdRoute: ThreadsThreadIdRoute,
   SettingsProvidersProviderNameRoute: SettingsProvidersProviderNameRoute,
