@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 // @ts-ignore
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
+// import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import packageJson from './package.json'
 const host = process.env.TAURI_DEV_HOST
 
@@ -22,9 +22,9 @@ export default defineConfig(({ mode }) => {
       }),
       react(),
       tailwindcss(),
-      nodePolyfills({
-        include: ['path'],
-      }),
+      // nodePolyfills({
+      //   include: ['path'],
+      // }),
     ],
     resolve: {
       alias: {

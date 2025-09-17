@@ -17,7 +17,6 @@ vi.mock('@/lib/platform/const', () => ({
     systemIntegrations: true,
     httpsProxy: true,
     defaultProviders: true,
-    analytics: true,
     webAutoModelSelection: false,
     modelProviderSettings: true,
     mcpAutoApproveTools: false,
@@ -61,11 +60,6 @@ const mockServiceHub = {
     getSystemInfo: vi.fn().mockResolvedValue({}),
     relocateJanDataFolder: vi.fn().mockResolvedValue(undefined),
     getJanDataFolder: vi.fn().mockResolvedValue('/mock/jan/data'),
-  }),
-  analytic: () => ({
-    track: vi.fn(),
-    identify: vi.fn(),
-    page: vi.fn(),
   }),
   messages: () => ({
     createMessage: vi.fn().mockResolvedValue({ id: 'test-message' }),

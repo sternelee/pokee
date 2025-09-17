@@ -33,10 +33,7 @@ export enum PlatformFeature {
   
   // Default model providers (OpenAI, Anthropic, etc.)
   DEFAULT_PROVIDERS = 'defaultProviders',
-  
-  // Analytics and telemetry
-  ANALYTICS = 'analytics',
-  
+
   // Web-specific automatic model selection from jan provider
   WEB_AUTO_MODEL_SELECTION = 'webAutoModelSelection',
   
