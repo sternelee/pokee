@@ -39,5 +39,17 @@
   "args": "Args",
   "env": "Env",
   "serverStatusActive": "Server {{serverKey}} activated successfully",
-  "serverStatusInactive": "Server {{serverKey}} deactivated successfully"
+  "serverStatusInactive": "Server {{serverKey}} deactivated successfully",
+  "viewTools": {
+    "title": "View Tools for {{serverName}}"
+  },
+  "toolsDialogTitle": "Tools for {{serverName}}",
+  "toolsDialogDesc": "View and manage available tools for this MCP server",
+  "toolsList": "Available Tools",
+  "noToolsFound": "No tools found for this server",
+  "toolsFound": "tools found",
+  "fetchToolsError": "Failed to fetch tools for server {{serverName}}",
+  "toolDescription": "Description",
+  "toolInputSchema": "Input Schema",
+  "toolServer": "Server"
 }

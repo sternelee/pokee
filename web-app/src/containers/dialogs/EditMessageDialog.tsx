@@ -64,9 +64,11 @@ export function EditMessageDialog({
   const defaultTrigger = (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button className="flex outline-0 items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
-          <IconPencil size={16} />
-        </button>
+        <DialogTrigger asChild>
+          <button className="flex outline-0 items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
+            <IconPencil size={16} />
+          </button>
+        </DialogTrigger>
       </TooltipTrigger>
       <TooltipContent>
         <p>{t('edit')}</p>
@@ -76,7 +78,7 @@ export function EditMessageDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>{triggerElement || defaultTrigger}</DialogTrigger>
+      {triggerElement || defaultTrigger}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('common:dialogs.editMessage.title')}</DialogTitle>

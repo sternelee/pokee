@@ -8,7 +8,7 @@ export interface MCPInterface {
   /**
    * Get all available MCP tools
    */
-  getTools(): Promise<MCPTool[]>
+  getTools(serverName?: string): Promise<MCPTool[]>
 
   /**
    * Call a specific MCP tool

@@ -18,6 +18,14 @@ export type MCPServers = {
   [key: string]: MCPServerConfig
 }
 
+// Define the structure of a tool with server information
+export interface ToolWithServer {
+  name: string
+  description?: string
+  input_schema: any
+  server: string
+}
+
 type MCPServerStoreState = {
   open: boolean
   mcpServers: MCPServers

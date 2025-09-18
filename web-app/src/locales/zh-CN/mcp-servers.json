@@ -39,5 +39,17 @@
   "args": "参数",
   "env": "环境",
   "serverStatusActive": "服务器 {{serverKey}} 激活成功",
-  "serverStatusInactive": "服务器 {{serverKey}} 停用成功"
+  "serverStatusInactive": "服务器 {{serverKey}} 停用成功",
+  "viewTools": {
+    "title": "查看 {{serverName}} 的工具"
+  },
+  "toolsDialogTitle": "{{serverName}} 的工具",
+  "toolsDialogDesc": "查看和管理此 MCP 服务器的可用工具",
+  "toolsList": "可用工具",
+  "noToolsFound": "未找到此服务器的工具",
+  "toolsFound": "个工具",
+  "fetchToolsError": "获取服务器 {{serverName}} 的工具失败",
+  "toolDescription": "描述",
+  "toolInputSchema": "输入架构",
+  "toolServer": "服务器"
 }

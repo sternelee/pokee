@@ -13,7 +13,7 @@ export abstract class MCPExtension extends BaseExtension implements MCPInterface
     return ExtensionTypeEnum.MCP
   }
 
-  abstract getTools(): Promise<MCPTool[]>
+  abstract getTools(serverName?: string): Promise<MCPTool[]>
   abstract callTool(toolName: string, args: Record<string, unknown>): Promise<MCPToolCallResult>
   abstract getConnectedServers(): Promise<string[]>
   abstract refreshTools(): Promise<void>

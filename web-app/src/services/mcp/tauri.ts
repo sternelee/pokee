@@ -23,8 +23,8 @@ export class TauriMCPService extends DefaultMCPService {
     return mcpConfig
   }
 
-  async getTools(): Promise<MCPTool[]> {
-    return window.core?.api?.getTools()
+  async getTools(serverName?: string): Promise<ToolWithServer[]> {
+    return window.core?.api?.getTools(serverName)
   }
 
   async getConnectedServers(): Promise<string[]> {

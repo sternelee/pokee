@@ -8,12 +8,14 @@ import {
   IconPlus,
   IconTrash,
   IconCodeCircle,
+  IconTool,
 } from '@tabler/icons-react'
 import { useMCPServers, MCPServerConfig } from '@/hooks/useMCPServers'
 import { useEffect, useState } from 'react'
 import AddEditMCPServer from '@/containers/dialogs/AddEditMCPServer'
 import DeleteMCPServerConfirm from '@/containers/dialogs/DeleteMCPServerConfirm'
 import EditJsonMCPserver from '@/containers/dialogs/EditJsonMCPserver'
+import { MCPServerToolsDialog } from '@/containers/dialogs/MCPServerToolsDialog'
 import { Switch } from '@/components/ui/switch'
 import { twMerge } from 'tailwind-merge'
 import { useServiceHub } from '@/hooks/useServiceHub'
@@ -23,6 +25,7 @@ import { useTranslation } from '@/i18n/react-i18next-compat'
 import { useAppState } from '@/hooks/useAppState'
 import { PlatformGuard } from '@/lib/platform/PlatformGuard'
 import { PlatformFeature } from '@/lib/platform'
+import { cn } from '@/lib/utils'
 
 // Function to mask sensitive values
 const maskSensitiveValue = (value: string) => {
@@ -128,6 +131,10 @@ function MCPServersDesktop() {
   const [jsonEditorData, setJsonEditorData] = useState<
     MCPServerConfig | Record<string, MCPServerConfig> | undefined
   >(undefined)
+
+  // Tools dialog state
+  const [toolsDialogOpen, setToolsDialogOpen] = useState(false)
+  const [toolsServerName, setToolsServerName] = useState<string | null>(null)
   const [connectedServers, setConnectedServers] = useState<string[]>([])
   const [loadingServers, setLoadingServers] = useState<{
     [key: string]: boolean
@@ -206,6 +213,11 @@ function MCPServersDesktop() {
       setJsonEditorData(mcpServers)
     }
     setJsonEditorOpen(true)
+  }
+
+  const handleOpenToolsDialog = (serverKey: string) => {
+    setToolsServerName(serverKey)
+    setToolsDialogOpen(true)
   }
 
   const handleSaveJson = async (
@@ -455,6 +467,29 @@ function MCPServersDesktop() {
                     actions={
                       <div className="flex items-center gap-0.5">
                         <div
+                          className={cn(
+                            'size-6 cursor-pointer flex items-center justify-center rounded hover:bg-main-view-fg/10 transition-all duration-200 ease-in-out',
+                            !connectedServers.includes(key) &&
+                              'opacity-50 cursor-not-allowed'
+                          )}
+                          onClick={() =>
+                            connectedServers.includes(key) &&
+                            handleOpenToolsDialog(key)
+                          }
+                          title={t('mcp-servers:viewTools.title', {
+                            serverName: key,
+                          })}
+                        >
+                          <IconTool
+                            size={18}
+                            className={twMerge(
+                              'text-main-view-fg/50',
+                              connectedServers.includes(key) &&
+                                'hover:text-accent'
+                            )}
+                          />
+                        </div>
+                        <div
                           className="size-6 cursor-pointer flex items-center justify-center rounded hover:bg-main-view-fg/10 transition-all duration-200 ease-in-out"
                           onClick={() => handleOpenJsonEditor(key)}
                           title={t('mcp-servers:editJson.title', {
@@ -531,6 +566,13 @@ function MCPServersDesktop() {
           jsonEditorData as MCPServerConfig | Record<string, MCPServerConfig>
         }
         onSave={handleSaveJson}
+      />
+
+      {/* Tools detail dialog */}
+      <MCPServerToolsDialog
+        open={toolsDialogOpen}
+        onOpenChange={setToolsDialogOpen}
+        serverName={toolsServerName || ''}
       />
     </div>
   )
