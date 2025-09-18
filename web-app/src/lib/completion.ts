@@ -102,54 +102,80 @@ export const sendTauriCompletion = async (
     }
 
     if (stream) {
-      // Handle streaming completion
-      await invoke<string>('send_completion', { request: completionRequest })
+      // Set up event listener BEFORE invoking the completion to avoid missing events
+      const eventName = 'completion-stream'
+      const chunks: any[] = []
+      let isComplete = false
+      let unlisten: (() => void) | null = null
 
-      // Create stream response using AsyncGenerator
-      async function* createStream() {
-        let unlisten: (() => void) | null = null
+      try {
+        // Set up event listener for streaming events
+        unlisten = await listen(eventName, (event: Event<any>) => {
+          const { content, event_type, is_final } = event.payload
 
-        try {
-          // Set up event listener for streaming events
-          unlisten = await listen('completion-stream', (event: Event<any>) => {
-            const { content, event_type, is_final } = event.payload
-
-            if (event_type === 'text') {
-              // Create a chunk similar to chatCompletionChunk
-              // Note: We can't yield from inside the event listener
-              // This is a simplified implementation - in production you'd need a queue
-              console.log('Received text chunk:', content)
-            } else if (event_type === 'complete' || is_final) {
-              // End of stream
-            }
+          console.log('Received streaming event:', {
+            content,
+            event_type,
+            is_final,
           })
 
-          // Wait for completion or abort
-          await new Promise<void>((resolve) => {
-            const checkAbort = () => {
+          if (event_type === 'text' && content) {
+            // Create a chunk similar to chatCompletionChunk
+            const chunk = {
+              id: Date.now().toString(),
+              object: 'chat.completion.chunk',
+              created: Math.floor(Date.now() / 1000),
+              model: thread.model?.id || 'unknown',
+              choices: [
+                {
+                  index: 0,
+                  delta: { content },
+                  finish_reason: null,
+                },
+              ],
+            }
+            chunks.push(chunk)
+          } else if (event_type === 'complete' || is_final) {
+            isComplete = true
+          }
+        })
+
+        // Call the completion API
+        await invoke<string>('send_completion', { request: completionRequest })
+
+        // Create stream response using AsyncGenerator
+        return {
+          async *[Symbol.asyncIterator]() {
+            let index = 0
+
+            while (!isComplete) {
+              if (index < chunks.length) {
+                yield chunks[index]
+                index++
+              } else {
+                // Wait a bit for new chunks
+                await new Promise((resolve) => setTimeout(resolve, 50))
+              }
+
+              // Check if aborted
               if (abortController.signal.aborted) {
-                resolve()
+                break
               }
             }
-            abortController.signal.addEventListener('abort', checkAbort)
 
-            // For now, just wait a bit then resolve
-            // In a full implementation, you'd coordinate with the event listener
-            setTimeout(() => {
-              abortController.signal.removeEventListener('abort', checkAbort)
-              resolve()
-            }, 5000)
-          })
-        } finally {
-          if (unlisten) unlisten()
-        }
+            // Yield any remaining chunks
+            while (index < chunks.length) {
+              yield chunks[index]
+              index++
+            }
+          },
+        } as AsyncIterable<chatCompletionChunk>
+      } catch (error) {
+        console.error('Streaming error:', error)
+        throw error
+      } finally {
+        if (unlisten) unlisten()
       }
-
-      return {
-        async *[Symbol.asyncIterator]() {
-          yield* createStream()
-        },
-      } as AsyncIterable<chatCompletionChunk>
     } else {
       // Handle non-streaming completion
       const response = await invoke<CompletionResponse>('send_completion', {
