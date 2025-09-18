@@ -2,7 +2,10 @@ use super::{ChatMessage, ChatRequest, ChatService};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
-use std::sync::Once;
+use std::sync::{
+    atomic::{AtomicU32, Ordering},
+    Once,
+};
 use tauri::{Emitter, Runtime};
 
 /// Set environment variables for AI providers
@@ -18,6 +21,7 @@ pub async fn set_provider_env_vars_cmd(
 
 static CHAT_SERVICE_INIT: Once = Once::new();
 static mut CHAT_SERVICE: Option<ChatService> = None;
+static REQUEST_COUNTER: AtomicU32 = AtomicU32::new(0);
 
 /// Set environment variables for the given provider
 fn set_provider_env_vars(provider: &str, api_key: Option<&String>, base_url: Option<&String>) {
@@ -106,6 +110,20 @@ pub struct CompletionChoice {
     pub index: u32,
     pub message: CompletionMessage,
     pub finish_reason: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct CompletionChunkPayload {
+    pub request_id: u32,
+    pub content: String,
+    pub event_type: String,
+    pub is_final: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct CompletionEndPayload {
+    pub request_id: u32,
+    pub status: u16,
 }
 
 fn get_chat_service() -> &'static ChatService {
@@ -227,6 +245,9 @@ pub async fn send_completion<R: Runtime>(
     app_handle: tauri::AppHandle<R>,
     request: CompletionRequest,
 ) -> Result<serde_json::Value, String> {
+    let request_id = REQUEST_COUNTER.fetch_add(1, Ordering::SeqCst);
+    let event_name = "completion-stream";
+
     // Convert completion request to chat service format
     let chat_messages: Vec<ChatMessage> = request
         .messages
@@ -257,10 +278,10 @@ pub async fn send_completion<R: Runtime>(
 
     // Use streaming or non-streaming based on request
     if request.stream.unwrap_or(true) {
-        let event_name = "completion-stream";
         let app_handle_clone = app_handle.clone();
 
-        let stream_id = tokio::task::spawn_blocking(move || {
+        // Process streaming synchronously to ensure proper event emission
+        let result = tokio::task::spawn_blocking(move || {
             let chat_service = get_chat_service();
 
             // Use a blocking runtime for the non-Send future
@@ -268,26 +289,63 @@ pub async fn send_completion<R: Runtime>(
                 .map_err(|e| format!("Failed to create runtime: {}", e))?;
 
             rt.block_on(async {
-                chat_service
+                match chat_service
                     .stream_chat(chat_request, move |event| {
                         let app_handle = app_handle_clone.clone();
 
+                        // Convert event to chunk payload and emit immediately
+                        let payload = CompletionChunkPayload {
+                            request_id,
+                            content: event.content.clone(),
+                            event_type: event.event_type.clone(),
+                            is_final: event.is_final,
+                        };
+
                         // Emit the streaming event to the frontend
-                        if let Err(e) = app_handle.emit(event_name, event) {
+                        if let Err(e) = app_handle.emit(event_name, payload) {
                             eprintln!("Failed to emit completion stream event: {}", e);
                         }
                     })
                     .await
+                {
+                    Ok(stream_id) => {
+                        // Send completion end event
+                        let end_payload = CompletionEndPayload {
+                            request_id,
+                            status: 200,
+                        };
+                        let _ = app_handle.emit(event_name, end_payload);
+
+                        Ok(stream_id)
+                    }
+                    Err(e) => {
+                        // Send error end event
+                        let end_payload = CompletionEndPayload {
+                            request_id,
+                            status: 500,
+                        };
+                        let _ = app_handle.emit(event_name, end_payload);
+
+                        Err(e)
+                    }
+                }
             })
         })
         .await
-        .map_err(|e| format!("Task failed: {}", e))?
-        .map_err(|e| format!("Failed to stream completion: {}", e))?;
+        .map_err(|e| format!("Task failed: {}", e))?;
 
-        Ok(serde_json::json!({
-            "stream_id": stream_id,
-            "status": "streaming"
-        }))
+        match result {
+            Ok(stream_id) => {
+                Ok(serde_json::json!({
+                    "request_id": request_id,
+                    "stream_id": stream_id,
+                    "status": "streaming_completed"
+                }))
+            }
+            Err(e) => {
+                Err(format!("Streaming failed: {}", e))
+            }
+        }
     } else {
         let response = tokio::task::spawn_blocking(move || {
             let chat_service = get_chat_service();
