@@ -31,6 +31,8 @@ type DynamicControllerProps = {
     recommended?: string
   }
   onChange: (value: string | boolean | number) => void
+  provider?: string
+  settingKey?: string
 }
 
 export function DynamicControllerSetting({
@@ -38,7 +40,45 @@ export function DynamicControllerSetting({
   controllerType,
   controllerProps,
   onChange,
+  provider,
+  settingKey,
 }: DynamicControllerProps) {
+  // Function to get environment variable hint based on setting key and provider
+  const getEnvVarHint = (): string | undefined => {
+    if (controllerType === 'input' && controllerProps.type === 'password') {
+      // This is likely an API key field
+      if (provider) {
+        switch (provider) {
+          case 'openai':
+          case 'openai-compatible':
+            return 'OPENAI_API_KEY'
+          case 'anthropic':
+            return 'ANTHROPIC_API_KEY'
+          case 'openrouter':
+            return 'OPENROUTER_API_KEY'
+          default:
+            return `${provider.toUpperCase()}_API_KEY`
+        }
+      }
+    }
+    if (controllerType === 'input' && controllerProps.type === 'url') {
+      // This is likely a base URL field
+      if (provider) {
+        switch (provider) {
+          case 'openai-compatible':
+            return 'OPENAI_BASE_URL'
+          case 'openrouter':
+            return 'OPENROUTER_BASE_URL'
+          default:
+            return `${provider.toUpperCase()}_BASE_URL`
+        }
+      }
+    }
+    return undefined
+  }
+
+  const envVarHint = settingKey ? getEnvVarHint() : undefined
+
   if (controllerType === 'input') {
     return (
       <InputControl
@@ -51,6 +91,9 @@ export function DynamicControllerSetting({
         }
         inputActions={controllerProps.input_actions}
         className={className}
+        envVarHint={envVarHint}
+        provider={provider}
+        settingKey={settingKey}
         onChange={(newValue) => onChange(newValue)}
       />
     )

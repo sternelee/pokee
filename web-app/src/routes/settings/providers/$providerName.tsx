@@ -478,6 +478,8 @@ function ProviderDetail() {
                                 'third-step-setup-remote-provider',
                               setting.key === 'device' && 'hidden'
                             )}
+                            provider={provider?.provider}
+                            settingKey={setting.key}
                             onChange={(newValue) => {
                               if (provider) {
                                 const newSettings = [...provider.settings]

@@ -1,11 +1,61 @@
 use super::{ChatMessage, ChatRequest, ChatService};
-use std::sync::Once;
-use tauri::{Emitter, Runtime};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::env;
+use std::sync::Once;
+use tauri::{Emitter, Runtime};
+
+/// Set environment variables for AI providers
+#[tauri::command]
+pub async fn set_provider_env_vars_cmd(
+    provider: String,
+    api_key: Option<String>,
+    base_url: Option<String>,
+) -> Result<(), String> {
+    set_provider_env_vars(&provider, api_key.as_ref(), base_url.as_ref());
+    Ok(())
+}
 
 static CHAT_SERVICE_INIT: Once = Once::new();
 static mut CHAT_SERVICE: Option<ChatService> = None;
+
+/// Set environment variables for the given provider
+fn set_provider_env_vars(provider: &str, api_key: Option<&String>, base_url: Option<&String>) {
+    // Set API key environment variable based on provider
+    if let Some(key) = api_key {
+        match provider {
+            "openai" | "openai-compatible" => {
+                env::set_var("OPENAI_API_KEY", key);
+            }
+            "anthropic" => {
+                env::set_var("ANTHROPIC_API_KEY", key);
+            }
+            "openrouter" => {
+                env::set_var("OPENROUTER_API_KEY", key);
+            }
+            _ => {
+                // For unknown providers, try generic naming
+                env::set_var(format!("{}_API_KEY", provider.to_uppercase()), key);
+            }
+        }
+    }
+
+    // Set base URL if provided
+    if let Some(url) = base_url {
+        match provider {
+            "openai-compatible" => {
+                env::set_var("OPENAI_BASE_URL", url);
+            }
+            "openrouter" => {
+                env::set_var("OPENROUTER_BASE_URL", url);
+            }
+            _ => {
+                // For other providers, set generic base URL env var
+                env::set_var(format!("{}_BASE_URL", provider.to_uppercase()), url);
+            }
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CompletionTool {
@@ -178,16 +228,20 @@ pub async fn send_completion<R: Runtime>(
     request: CompletionRequest,
 ) -> Result<serde_json::Value, String> {
     // Convert completion request to chat service format
-    let chat_messages: Vec<ChatMessage> = request.messages.iter().map(|msg| {
-        ChatMessage {
+    let chat_messages: Vec<ChatMessage> = request
+        .messages
+        .iter()
+        .map(|msg| ChatMessage {
             role: msg.role.clone(),
             content: msg.content.clone().unwrap_or_default(),
             timestamp: None,
-        }
-    }).collect();
+        })
+        .collect();
 
     // Build the prompt from the last user message
-    let prompt = request.messages.iter()
+    let prompt = request
+        .messages
+        .iter()
         .rev()
         .find(|msg| msg.role == "user")
         .and_then(|msg| msg.content.clone())
@@ -242,9 +296,7 @@ pub async fn send_completion<R: Runtime>(
             let rt = tokio::runtime::Runtime::new()
                 .map_err(|e| format!("Failed to create runtime: {}", e))?;
 
-            rt.block_on(async {
-                chat_service.chat_non_streaming(chat_request).await
-            })
+            rt.block_on(async { chat_service.chat_non_streaming(chat_request).await })
         })
         .await
         .map_err(|e| format!("Task failed: {}", e))?

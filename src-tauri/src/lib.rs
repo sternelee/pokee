@@ -100,6 +100,7 @@ pub fn run() {
             core::chat::commands::chat,
             core::chat::commands::cancel_chat_stream,
             core::chat::commands::send_completion,
+            core::chat::commands::set_provider_env_vars_cmd,
         ])
         .manage(AppState {
             app_token: Some(generate_app_token()),
