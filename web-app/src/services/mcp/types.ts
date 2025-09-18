@@ -3,6 +3,7 @@
  */
 
 import { MCPTool, MCPToolCallResult } from '@janhq/core'
+import type { ToolWithServer } from '@/hooks/useMCPServers'
 import type { MCPServerConfig, MCPServers } from '@/hooks/useMCPServers'
 
 export interface MCPConfig {
@@ -19,7 +20,7 @@ export interface MCPService {
   updateMCPConfig(configs: string): Promise<void>
   restartMCPServers(): Promise<void>
   getMCPConfig(): Promise<MCPConfig>
-  getTools(): Promise<MCPTool[]>
+  getTools(serverName?: string): Promise<ToolWithServer[]>
   getConnectedServers(): Promise<string[]>
   callTool(args: { toolName: string; arguments: object }): Promise<MCPToolCallResult>
   callToolWithCancellation(args: {

@@ -32,9 +32,11 @@ export function MessageMetadataDialog({
   const defaultTrigger = (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button className="outline-0 focus:outline-0 flex items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
-          <IconInfoCircle size={16} />
-        </button>
+        <DialogTrigger asChild>
+          <button className="outline-0 focus:outline-0 flex items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
+            <IconInfoCircle size={16} />
+          </button>
+        </DialogTrigger>
       </TooltipTrigger>
       <TooltipContent>
         <p>{t('metadata')}</p>
@@ -44,7 +46,7 @@ export function MessageMetadataDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>{triggerElement || defaultTrigger}</DialogTrigger>
+      {triggerElement || defaultTrigger}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('common:dialogs.messageMetadata.title')}</DialogTitle>

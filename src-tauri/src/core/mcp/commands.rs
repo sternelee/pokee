@@ -1,8 +1,8 @@
 use rmcp::model::{CallToolRequestParam, CallToolResult};
 use serde_json::{Map, Value};
 use tauri::{AppHandle, Emitter, Runtime, State};
-use tokio::time::timeout;
 use tokio::sync::oneshot;
+use tokio::time::timeout;
 
 use super::{
     constants::{DEFAULT_MCP_CONFIG, MCP_TOOL_CALL_TIMEOUT},
@@ -127,35 +127,48 @@ pub async fn get_connected_servers(
     Ok(servers_map.keys().cloned().collect())
 }
 
-/// Retrieves all available tools from all MCP servers with server information
+/// Retrieves available tools from MCP servers with server information
 ///
 /// # Arguments
 /// * `state` - Application state containing MCP server connections
+/// * `server_name` - Optional specific server name to get tools from. If None, returns tools from all servers
 ///
 /// # Returns
-/// * `Result<Vec<Tool>, String>` - A vector of all tools if successful, or an error message if failed
+/// * `Result<Vec<Tool>, String>` - A vector of tools if successful, or an error message if failed
 ///
 /// This function:
 /// 1. Locks the MCP servers mutex to access server connections
-/// 2. Iterates through all connected servers
-/// 3. Gets the list of tools from each server
-/// 4. Associates each tool with its parent server name
-/// 5. Combines all tools into a single vector
-/// 6. Returns the combined list of all available tools with server information
+/// 2. If server_name is provided, only gets tools from that specific server
+/// 3. If server_name is None, iterates through all connected servers
+/// 4. Gets the list of tools from each server
+/// 5. Associates each tool with its parent server name
+/// 6. Combines all tools into a single vector
+/// 7. Returns the combined list of available tools with server information
 #[tauri::command]
-pub async fn get_tools(state: State<'_, AppState>) -> Result<Vec<ToolWithServer>, String> {
+pub async fn get_tools(
+    state: State<'_, AppState>,
+    server_name: Option<String>,
+) -> Result<Vec<ToolWithServer>, String> {
     let servers = state.mcp_servers.lock().await;
     let mut all_tools: Vec<ToolWithServer> = Vec::new();
 
-    for (server_name, service) in servers.iter() {
+    for (name, service) in servers.iter() {
+        // If server_name is provided, only process that specific server
+        if let Some(ref target_server) = server_name {
+            if name != target_server {
+                continue;
+            }
+        }
+
         // List tools with timeout
         let tools_future = service.list_all_tools();
         let tools = match timeout(MCP_TOOL_CALL_TIMEOUT, tools_future).await {
             Ok(result) => result.map_err(|e| e.to_string())?,
             Err(_) => {
                 log::warn!(
-                    "Listing tools timed out after {} seconds",
-                    MCP_TOOL_CALL_TIMEOUT.as_secs()
+                    "Listing tools timed out after {} seconds for server {}",
+                    MCP_TOOL_CALL_TIMEOUT.as_secs(),
+                    name
                 );
                 continue; // Skip this server and continue with others
             }
@@ -166,7 +179,7 @@ pub async fn get_tools(state: State<'_, AppState>) -> Result<Vec<ToolWithServer>
                 name: tool.name.to_string(),
                 description: tool.description.as_ref().map(|d| d.to_string()),
                 input_schema: serde_json::Value::Object((*tool.input_schema).clone()),
-                server: server_name.clone(),
+                server: name.clone(),
             });
         }
     }
@@ -200,7 +213,7 @@ pub async fn call_tool(
 ) -> Result<CallToolResult, String> {
     // Set up cancellation if token is provided
     let (cancel_tx, cancel_rx) = oneshot::channel::<()>();
-    
+
     if let Some(token) = &cancellation_token {
         let mut cancellations = state.tool_call_cancellations.lock().await;
         cancellations.insert(token.clone(), cancel_tx);
@@ -281,14 +294,17 @@ pub async fn cancel_tool_call(
     cancellation_token: String,
 ) -> Result<(), String> {
     let mut cancellations = state.tool_call_cancellations.lock().await;
-    
+
     if let Some(cancel_tx) = cancellations.remove(&cancellation_token) {
         // Send cancellation signal - ignore if receiver is already dropped
         let _ = cancel_tx.send(());
         println!("Tool call with token {} cancelled", cancellation_token);
         Ok(())
     } else {
-        Err(format!("Cancellation token {} not found", cancellation_token))
+        Err(format!(
+            "Cancellation token {} not found",
+            cancellation_token
+        ))
     }
 }
 

@@ -20,7 +20,7 @@ export class DefaultMCPService implements MCPService {
     return {}
   }
 
-  async getTools(): Promise<MCPTool[]> {
+  async getTools(serverName?: string): Promise<ToolWithServer[]> {
     return []
   }
 

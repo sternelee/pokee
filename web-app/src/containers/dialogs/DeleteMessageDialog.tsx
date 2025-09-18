@@ -41,9 +41,11 @@ export function DeleteMessageDialog({ onDelete }: DeleteMessageDialogProps) {
   const trigger = (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
-          <IconTrash size={16} />
-        </button>
+        <DialogTrigger asChild>
+          <button className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer group relative">
+            <IconTrash size={16} />
+          </button>
+        </DialogTrigger>
       </TooltipTrigger>
       <TooltipContent>
         <p>{t('delete')}</p>
@@ -53,7 +55,7 @@ export function DeleteMessageDialog({ onDelete }: DeleteMessageDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>{trigger}</DialogTrigger>
+      {trigger}
       <DialogContent
         onOpenAutoFocus={(e) => {
           e.preventDefault()
