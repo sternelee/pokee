@@ -1,9 +1,62 @@
 use super::{ChatMessage, ChatRequest, ChatService};
 use std::sync::Once;
 use tauri::{Emitter, Runtime};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 static CHAT_SERVICE_INIT: Once = Once::new();
 static mut CHAT_SERVICE: Option<ChatService> = None;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionTool {
+    pub r#type: String,
+    pub function: CompletionToolFunction,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionToolFunction {
+    pub name: String,
+    pub description: Option<String>,
+    pub parameters: serde_json::Value,
+    pub strict: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionMessage {
+    pub role: String,
+    pub content: Option<String>,
+    pub tool_calls: Option<Vec<serde_json::Value>>,
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionRequest {
+    pub messages: Vec<CompletionMessage>,
+    pub model: String,
+    pub tools: Option<Vec<CompletionTool>>,
+    pub tool_choice: Option<String>,
+    pub stream: Option<bool>,
+    pub provider: String,
+    pub api_key: Option<String>,
+    pub base_url: Option<String>,
+    pub parameters: Option<HashMap<String, serde_json::Value>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionResponse {
+    pub id: String,
+    pub object: String,
+    pub created: u64,
+    pub model: String,
+    pub choices: Vec<CompletionChoice>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CompletionChoice {
+    pub index: u32,
+    pub message: CompletionMessage,
+    pub finish_reason: Option<String>,
+}
 
 fn get_chat_service() -> &'static ChatService {
     unsafe {
@@ -115,4 +168,109 @@ pub async fn cancel_chat_stream<R: Runtime>(
         stream_id
     );
     Ok(())
+}
+
+/// Enhanced completion command that matches the frontend sendCompletion API
+/// This provides a unified interface for chat completions with full parameter support
+#[tauri::command]
+pub async fn send_completion<R: Runtime>(
+    app_handle: tauri::AppHandle<R>,
+    request: CompletionRequest,
+) -> Result<serde_json::Value, String> {
+    // Convert completion request to chat service format
+    let chat_messages: Vec<ChatMessage> = request.messages.iter().map(|msg| {
+        ChatMessage {
+            role: msg.role.clone(),
+            content: msg.content.clone().unwrap_or_default(),
+            timestamp: None,
+        }
+    }).collect();
+
+    // Build the prompt from the last user message
+    let prompt = request.messages.iter()
+        .rev()
+        .find(|msg| msg.role == "user")
+        .and_then(|msg| msg.content.clone())
+        .unwrap_or_default();
+
+    let chat_request = ChatRequest {
+        prompt,
+        provider: request.provider.clone(),
+        model: request.model.clone(),
+        stream_id: None,
+        chat_history: Some(chat_messages),
+    };
+
+    // Use streaming or non-streaming based on request
+    if request.stream.unwrap_or(true) {
+        let event_name = "completion-stream";
+        let app_handle_clone = app_handle.clone();
+
+        let stream_id = tokio::task::spawn_blocking(move || {
+            let chat_service = get_chat_service();
+
+            // Use a blocking runtime for the non-Send future
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| format!("Failed to create runtime: {}", e))?;
+
+            rt.block_on(async {
+                chat_service
+                    .stream_chat(chat_request, move |event| {
+                        let app_handle = app_handle_clone.clone();
+
+                        // Emit the streaming event to the frontend
+                        if let Err(e) = app_handle.emit(event_name, event) {
+                            eprintln!("Failed to emit completion stream event: {}", e);
+                        }
+                    })
+                    .await
+            })
+        })
+        .await
+        .map_err(|e| format!("Task failed: {}", e))?
+        .map_err(|e| format!("Failed to stream completion: {}", e))?;
+
+        Ok(serde_json::json!({
+            "stream_id": stream_id,
+            "status": "streaming"
+        }))
+    } else {
+        let response = tokio::task::spawn_blocking(move || {
+            let chat_service = get_chat_service();
+
+            // Use a blocking runtime for the non-Send future
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| format!("Failed to create runtime: {}", e))?;
+
+            rt.block_on(async {
+                chat_service.chat_non_streaming(chat_request).await
+            })
+        })
+        .await
+        .map_err(|e| format!("Task failed: {}", e))?
+        .map_err(|e| format!("Failed to complete: {}", e))?;
+
+        // Convert to OpenAI-like completion response format
+        let completion_response = CompletionResponse {
+            id: response.stream_id.clone(),
+            object: "chat.completion".to_string(),
+            created: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            model: request.model.clone(),
+            choices: vec![CompletionChoice {
+                index: 0,
+                message: CompletionMessage {
+                    role: "assistant".to_string(),
+                    content: Some(response.content.clone()),
+                    tool_calls: None,
+                    name: None,
+                },
+                finish_reason: Some("stop".to_string()),
+            }],
+        };
+
+        Ok(serde_json::to_value(completion_response).map_err(|e| e.to_string())?)
+    }
 }

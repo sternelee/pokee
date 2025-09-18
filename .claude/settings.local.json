@@ -4,7 +4,8 @@
       "Bash(rm:*)",
       "Bash(npm run type-check:*)",
       "Bash(python3:*)",
-      "Bash(cargo check:*)"
+      "Bash(cargo check:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

@@ -17,7 +17,6 @@ import { Route as ThreadsThreadIdRouteImport } from './routes/threads/$threadId'
 import { Route as SettingsShortcutsRouteImport } from './routes/settings/shortcuts'
 import { Route as SettingsMcpServersRouteImport } from './routes/settings/mcp-servers'
 import { Route as SettingsLocalApiServerRouteImport } from './routes/settings/local-api-server'
-import { Route as SettingsHttpsProxyRouteImport } from './routes/settings/https-proxy'
 import { Route as SettingsHardwareRouteImport } from './routes/settings/hardware'
 import { Route as SettingsGeneralRouteImport } from './routes/settings/general'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings/appearance'
@@ -65,11 +64,6 @@ const SettingsLocalApiServerRoute = SettingsLocalApiServerRouteImport.update({
   path: '/settings/local-api-server',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsHttpsProxyRoute = SettingsHttpsProxyRouteImport.update({
-  id: '/settings/https-proxy',
-  path: '/settings/https-proxy',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsHardwareRoute = SettingsHardwareRouteImport.update({
   id: '/settings/hardware',
   path: '/settings/hardware',
@@ -111,7 +105,6 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/general': typeof SettingsGeneralRoute
   '/settings/hardware': typeof SettingsHardwareRoute
-  '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
@@ -128,7 +121,6 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/general': typeof SettingsGeneralRoute
   '/settings/hardware': typeof SettingsHardwareRoute
-  '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
@@ -146,7 +138,6 @@ export interface FileRoutesById {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/general': typeof SettingsGeneralRoute
   '/settings/hardware': typeof SettingsHardwareRoute
-  '/settings/https-proxy': typeof SettingsHttpsProxyRoute
   '/settings/local-api-server': typeof SettingsLocalApiServerRoute
   '/settings/mcp-servers': typeof SettingsMcpServersRoute
   '/settings/shortcuts': typeof SettingsShortcutsRoute
@@ -165,7 +156,6 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/general'
     | '/settings/hardware'
-    | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
     | '/settings/shortcuts'
@@ -182,7 +172,6 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/general'
     | '/settings/hardware'
-    | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
     | '/settings/shortcuts'
@@ -199,7 +188,6 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/general'
     | '/settings/hardware'
-    | '/settings/https-proxy'
     | '/settings/local-api-server'
     | '/settings/mcp-servers'
     | '/settings/shortcuts'
@@ -217,7 +205,6 @@ export interface RootRouteChildren {
   SettingsAppearanceRoute: typeof SettingsAppearanceRoute
   SettingsGeneralRoute: typeof SettingsGeneralRoute
   SettingsHardwareRoute: typeof SettingsHardwareRoute
-  SettingsHttpsProxyRoute: typeof SettingsHttpsProxyRoute
   SettingsLocalApiServerRoute: typeof SettingsLocalApiServerRoute
   SettingsMcpServersRoute: typeof SettingsMcpServersRoute
   SettingsShortcutsRoute: typeof SettingsShortcutsRoute
@@ -284,13 +271,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsLocalApiServerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/https-proxy': {
-      id: '/settings/https-proxy'
-      path: '/settings/https-proxy'
-      fullPath: '/settings/https-proxy'
-      preLoaderRoute: typeof SettingsHttpsProxyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings/hardware': {
       id: '/settings/hardware'
       path: '/settings/hardware'
@@ -345,7 +325,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsAppearanceRoute: SettingsAppearanceRoute,
   SettingsGeneralRoute: SettingsGeneralRoute,
   SettingsHardwareRoute: SettingsHardwareRoute,
-  SettingsHttpsProxyRoute: SettingsHttpsProxyRoute,
   SettingsLocalApiServerRoute: SettingsLocalApiServerRoute,
   SettingsMcpServersRoute: SettingsMcpServersRoute,
   SettingsShortcutsRoute: SettingsShortcutsRoute,
